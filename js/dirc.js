@@ -123,7 +123,7 @@ function getPath(){
 	    ),
 	    depthTest: false,
 	    blending: THREE.AdditiveBlending,
-	    opacity: 0.9,
+	   // opacity: 0.9,
 	    transparent: true
 	});
 	
@@ -194,7 +194,7 @@ function init() {
     // Renderer
     renderer = new THREE.WebGLRenderer({antialias: true });
     renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( 1200, 700 ); // ( window.innerWidth, window.innerHeight );
+    renderer.setSize( 1200, 700 ); //( window.innerWidth, window.innerHeight );
     renderer.autoClear = false;
 
     container.appendChild( renderer.domElement );
@@ -241,21 +241,27 @@ function onDocumentMouseDown( event ) {
 }
 
 function movePhoton() {
-    var megatronPos=0;
-    if (timeline[megatronId] <= maxlen) {
-	var ratio = timeline[megatronId]/gpath[megatronId].getLength();
-	if (ratio> 1) ratio=1; 
-	megatronPos = gpath[megatronId].getPointAt(ratio);
-	pphotons.vertices[megatronId] =  megatronPos;
-	timeline[megatronId]  += effectController.speed;
-    }else{
-	timeline[megatronId] = 0;
+    var megatronPos=[];
+    for(var e =0;e<nEvents;e++){
+	megatronPos[e]=0;
+	var mp = megatronId + npath*e;
+	var pp = p - npath* Math.floor(p/npath);
+	if (timeline[mp] <= maxlen) {
+	    var ratio = timeline[mp]/gpath[megatronId].getLength();
+	    if (ratio> 1) ratio=1; 
+	    megatronPos[e] = gpath[megatronId].getPointAt(ratio);
+	    pphotons.vertices[mp] =  megatronPos[e];
+	    timeline[mp]  += effectController.speed;
+	}else{
+	    timeline[mp] = 0;
+	}
     }
 
     for (var p = 0; p < npath*nEvents; p++) {	
+	var e = Math.floor(p/npath);
 	var pp = p - npath* Math.floor(p/npath);
 	if (timeline[p] <= maxlen) {
-	    if(megatronPos.z < gpath[pp].points[0].z) continue;	    
+	    if(megatronPos[e].z < gpath[pp].points[0].z) continue;	    
 
 	    var ratio = timeline[p] /gpath[pp].getLength();
 	    if (ratio> 1) ratio=1;
